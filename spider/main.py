@@ -6,13 +6,14 @@ from domain import *
 from general import *
 
 PROJECT_NAME = "wikihow"
-HOMEPAGE = "https://www.wikihow.com"
+HOMEPAGE = "https://www.wikihow.com/Main-Page"
+WEBSITE_URL = "https://www.wikihow.com"
 DOMAIN_NAME = get_domain_name(HOMEPAGE)
 QUEUE_FILE = PROJECT_NAME + "/queue.txt"
 CRAWLED_FILE = PROJECT_NAME + "/crawled.txt"
 NUMBER_OF_THREADS = multiprocessing.cpu_count()
 queue = Queue()
-Spider(PROJECT_NAME, HOMEPAGE, DOMAIN_NAME)
+Spider(PROJECT_NAME, HOMEPAGE, DOMAIN_NAME, WEBSITE_URL)
 
 
 # Create worker threads (will die when main exits)

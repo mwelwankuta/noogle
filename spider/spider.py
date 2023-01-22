@@ -3,32 +3,35 @@ from link_finder import LinkFinder
 from domain import *
 from general import *
 from database.database import conn
+import os
 
 
 class Spider:
 
     project_name = ""
     base_url = ""
+    website_url = ""
     domain_name = ""
     queue_file = ""
     crawled_file = ""
     queue = set()
     crawled = set()
 
-    def __init__(self, project_name, base_url, domain_name):
+    def __init__(self, project_name, base_url, domain_name, website_url):
         Spider.project_name = project_name
         Spider.base_url = base_url
         Spider.domain_name = domain_name
         Spider.queue_file = Spider.project_name + "/queue.txt"
         Spider.crawled_file = Spider.project_name + "/crawled.txt"
+        Spider.website_url = website_url
         self.boot()
         self.crawl_page("First spider", Spider.base_url)
 
     # Creates directory and files for project on first run and starts the spider
     @staticmethod
     def boot():
-        create_project_dir(Spider.project_name)
-        create_data_files(Spider.project_name, Spider.base_url)
+        create_project_dir(use_path(Spider.project_name))
+        create_data_files(use_path(Spider.project_name), Spider.base_url)
         Spider.queue = file_to_set(Spider.queue_file)
         Spider.crawled = file_to_set(Spider.crawled_file)
 
@@ -57,13 +60,15 @@ class Spider:
             if "text/html" in response.getheader("Content-Type"):
                 html_bytes = response.read()
                 html_string = html_bytes.decode("utf-8")
-            finder = LinkFinder(Spider.base_url, page_url)
+            finder = LinkFinder(Spider.base_url, page_url, Spider.website_url)
             finder.feed(html_string)
         except Exception as e:
             print(str(e))
             return set()
 
-        Spider.save_meta_data(finder.page_meta_data())
+        page_meta_data = finder.page_meta_data()
+        page_header_titles = finder.page_titles()
+        Spider.save_page_info(page_meta_data, page_header_titles)
         return finder.page_links()
 
     # Saves queue data to project files
@@ -83,26 +88,34 @@ class Spider:
 
     @staticmethod
     def format_stored_meta_data(meta_info):
-        meta_data = [] 
+        meta_data = []
         for idx, meta_item in enumerate(meta_info):
             values = list(meta_item.values())
             if idx != len(meta_info) - 1:
-                meta_data.append(f"('{values[0]}','{values[1]}','{values[2]}'),")
+                meta_data.append(
+                    f"('{values[0]}','{values[1]}','{values[2]}'),")
             meta_data.append("(f'({values[0]}','{values[1]}','{values[2]})'")
         meta_as_str = ''.join(map(str, meta_data))
         return meta_as_str
-  
+
     # Saves gather meta info to database
     @staticmethod
-    def save_meta_data(meta_info):
+    def save_page_info(meta_info, header_titles):
+        cursor = conn.cursor()
         for link in meta_info:
             title = link["title"]
             description = link["description"]
             url = link["url"]
-            
-            sql = "insert into meta ('title', 'description', 'url') values (?, ?, ?);"
-            conn.execute(sql, (title, description, url))
-            conn.commit()
-            print("DATABASE: INSERTED", conn.total_changes)
 
+            sql_meta = "insert into meta ('title', 'description', 'url') values (?, ?, ?);"
+            cursor.execute(sql_meta, (title, description, url))
 
+            meta_id = cursor.lastrowid
+
+            for title in header_titles:
+                more_than_one_word = len(title.split(' ')) > 1
+                if more_than_one_word:
+                    sql_header = "insert into titles ('meta_id', 'title') values (?, ?);"
+                    cursor.execute(sql_header, (meta_id, title))
+        conn.commit()
+        cursor.close()

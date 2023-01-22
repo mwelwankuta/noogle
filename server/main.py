@@ -1,9 +1,15 @@
-from flask import Flask
+from flask import Flask, request, jsonify
+from database import conn
+import json
 
 app = Flask(__name__)
+db = conn.cursor()
 
-@app.route('/')
-def home():
-    user = {"name": "Clive Lucas","age" : "Non binary"}
-    return  user
-app.run('127.0.0.1',8080, debug=True,)
+
+@app.route('/', methods=['POST'])
+def search():
+    search = request.data
+    return jsonify(search)
+
+
+app.run('127.0.0.1', 8080)
