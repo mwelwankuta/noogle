@@ -12,6 +12,7 @@ def question_controller(args: Dict):
         return []
 
     question = parse_question(query)
+
     for word in question.split(' '):
         wild_card_search = f"%{word}%"
         result = db.execute("""
@@ -20,10 +21,12 @@ def question_controller(args: Dict):
                 AS titles 
             FROM meta LEFT JOIN titles 
                 ON titles.meta_id = meta.id
-            WHERE meta.description LIKE ?
-                OR meta.title LIKE ?
-                OR titles.title LIKE ?
-            GROUP BY meta.id;
+            WHERE (meta.title != 'Main Page' AND meta.description != 'Main Page')
+            AND 
+                meta.description
+                LIKE ? OR meta.title LIKE ? OR titles.title LIKE ? 
+            GROUP BY
+                meta.id;
         """, (wild_card_search, wild_card_search, wild_card_search, ))
 
         for row in result.fetchall():
@@ -34,13 +37,15 @@ def question_controller(args: Dict):
                 "titles": parse_title(row[4]),
             }
             results.append(search_query_result)
-
-    return {"results": results,"count": len(results), "query": question}
+    
+    kinda_ranked_search_results = sorted(results, key=lambda result: len(result["titles"]))
+    return {"count": len(results), "optimal_search_query": question,"results": kinda_ranked_search_results,}
 
 def parse_title(title: str) -> List[str]:
     if title is not None:
         titles = title.split("+|+")
         return titles
+    return []
 
 def parse_question(text: str):
     parsed_question = set()

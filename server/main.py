@@ -6,6 +6,10 @@ import json
 app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
+def home():
+    return "Welcome to noogle search. visit /search?q=your search query to search" 
+
+@app.route('/search', methods=['GET'])
 def search():
     args = request.args
     return question_controller(args)
