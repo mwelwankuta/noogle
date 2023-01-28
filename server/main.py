@@ -1,15 +1,14 @@
 from flask import Flask, request, jsonify
 from database import conn
+from question import question_controller
 import json
 
 app = Flask(__name__)
-db = conn.cursor()
 
-
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET'])
 def search():
-    search = request.data
-    return jsonify(search)
+    args = request.args
+    return question_controller(args)
 
-
-app.run('127.0.0.1', 8080)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080, debug=True)

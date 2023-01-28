@@ -1,2 +1,3 @@
 # noogle
-a search engine for wikihow
+
+a search engine for how questions

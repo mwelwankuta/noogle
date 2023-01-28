@@ -22,6 +22,7 @@ class LinkFinder(HTMLParser):
                     self.current_tag_is_header = True
         else:
             self.current_tag_is_header = False
+
         if tag == "a":
             for (attribute, value) in attrs:
                 if attribute == "href":
