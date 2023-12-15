@@ -1,7 +1,6 @@
 import os
 absolute_path = os.path.dirname(__file__)
 
-
 def use_path(path):
     return os.path.join(absolute_path, path)
 

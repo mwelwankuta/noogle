@@ -1,9 +1,12 @@
 import threading
 import multiprocessing
+
 from queue import Queue
-from spider import Spider
-from domain import *
-from general import *
+from crawler.utilities import *
+from shared.utilities import get_domain_name
+from shared.log import setup_custom_logger
+from crawler.bot import Bot
+logger = setup_custom_logger('root')
 
 NUMBER_OF_THREADS = multiprocessing.cpu_count()
 queue = Queue()
@@ -15,7 +18,7 @@ DOMAIN_NAME = get_domain_name(HOMEPAGE)
 QUEUE_FILE = PROJECT_NAME + "/queue.txt"
 CRAWLED_FILE = PROJECT_NAME + "/crawled.txt"
 
-Spider(PROJECT_NAME, HOMEPAGE, DOMAIN_NAME, WEBSITE_URL)
+Bot(PROJECT_NAME, HOMEPAGE, DOMAIN_NAME, WEBSITE_URL)
 
 # Create worker threads (will die when main exits)
 def create_workers():
@@ -29,7 +32,7 @@ def create_workers():
 def work():
     while True:
         url = queue.get()
-        Spider.crawl_page(threading.current_thread().name, url)
+        Bot.crawl_page(threading.current_thread().name, url)
         queue.task_done()
 
 
@@ -45,9 +48,6 @@ def create_jobs():
 def crawl():
     queued_links = file_to_set(QUEUE_FILE)
     if len(queued_links) > 0:
-        print(str(len(queued_links)) + " links in the queue")
+        msg = str(len(queued_links)) + " links in the queue"
+        logger.debug(f"crawl(): {msg}")
         create_jobs()
-
-
-create_workers()
-crawl()

@@ -1,6 +1,8 @@
 from typing import Dict, List
-from dictionary import joining_words, question_words
-from database import conn
+from shared.utilities import filtered_sentence
+from database.connection import conn
+import nltk
+nltk.download('punkt')
 
 db = conn.cursor()
 
@@ -49,18 +51,7 @@ def parse_title(title: str) -> List[str]:
 
 def parse_question(text: str):
     parsed_question = set()
-    words = text.split(' ')
-    for word in words:
-        if is_question(word) == False and is_joining_word(word) == False:
-            parsed_question.add(word)
+    words = filtered_sentence(text)
+    for word in nltk.word_tokenize(words):
+        parsed_question.add(word)
     return " ".join(list(parsed_question))
-
-def is_question(text:str):
-    if text in question_words:
-        return True
-    return False
-
-def is_joining_word(text:str):
-    if text in joining_words:
-        return True
-    return False
