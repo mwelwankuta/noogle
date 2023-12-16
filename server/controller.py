@@ -6,14 +6,9 @@ nltk.download('punkt')
 
 db = conn.cursor()
 
-def question_controller(args: Dict):
-    query = args.get("q")
-    results = []
-
-    if len(query) == 0 or query is None:
-        return []
-
+def question_controller(query: str):
     question = parse_question(query)
+    results = []
 
     for word in question.split(' '):
         wild_card_search = f"%{word}%"

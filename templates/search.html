@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Results</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 p-8 max-w-5xl mx-auto">
+    <!-- Search bar -->
+    <div class="mb-8 sticky top-0 bg-white mb-3 p-2 border-1 rounded-sm z-10">
+      <form action="/" method="get">
+        <h1 class="text-center font-bold text-3xl text-blue-400 mb-5">
+          Noogle Search
+        </h1>
+        <input
+          type="text"
+          name="q"
+          value="{{search_results['optimal_search_query']}}"
+          placeholder="Search as a question..."
+          class="w-full p-2 rounded border focus:outline-none focus:ring focus:border-blue-300"
+        />
+      </form>
+    </div>
+
+    <!-- Search results -->
+    <div>
+      {% for result in search_results["results"] %}
+      <div class="bg-white p-4 rounded shadow mb-2">
+        <h2 class="text-xl font-semibold mb-2">
+          {{ result.search_description }}
+        </h2>
+        <p class="mb-2">{{ result.title }}</p>
+
+        <div class="text-gray-600">
+          {% for title in result['titles'] %}
+          <p class="p-2 rounded-md bg-gray-100 border-1 mb-1">{{title}}</p>
+          {%endfor%}
+        </div>
+        <a
+          href="{{result.search_title}}"
+          target="_blank"
+          class="text-blue-500 hover:underline"
+          >Read more</a
+        >
+      </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>
