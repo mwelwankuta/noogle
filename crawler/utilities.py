@@ -40,15 +40,12 @@ def append_to_file(path, data):
 def delete_file_contents(path):
     open(path, 'w').close()
 
-
-# Read a file and convert each line to set items
 def file_to_set(file_name):
     results = set()
-    with open(use_path(file_name), 'rt') as f:
+    with open(use_path(file_name), 'rt', encoding='utf-8-sig') as f:
         for line in f:
             results.add(line.replace('\n', ''))
     return results
-
 
 # Iterate through a set, each item will be a line in a file
 def set_to_file(links, file_name):

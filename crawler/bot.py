@@ -1,5 +1,5 @@
 from urllib.request import urlopen
-from crawler.utilities import *
+from crawler.utilities import file_to_set, create_data_files, create_project_dir,use_path,set_to_file
 from crawler.links import LinkFinder
 from shared.utilities import get_domain_name
 from database.connection import conn
