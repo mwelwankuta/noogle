@@ -30,4 +30,4 @@ def search_endpoint():
     return question_controller(query)
 
 if __name__ == "__main__":
-    app.run(debug = True)
+    app.run()
