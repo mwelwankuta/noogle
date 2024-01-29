@@ -44,9 +44,9 @@ def delete_file_contents(path):
 # Read a file and convert each line to set items
 def file_to_set(file_name):
     results = set()
-    with open(use_path(file_name), 'rt') as f:
+    with open(use_path(file_name), 'rt', encoding='utf-8') as f:
         for line in f:
-            results.add(line.replace('\n', ''))
+            results.add(line.rstrip('\n'))
     return results
 
 
